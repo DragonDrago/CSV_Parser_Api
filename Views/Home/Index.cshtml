@@ -1,0 +1,59 @@
+﻿@using CSV_Parser_Api.Models
+@model IEnumerable<Employee>
+@{ 
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Employees</h2>
+@if (!Model.Any())
+{
+    <p>We dont have any employees yet</p>
+}
+else
+{
+    <table id="employees" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Employee Name</th>
+                <th>Payroll Number</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var employee in Model)
+                {
+                    <tr>
+                        <td>@employee.Forenames</td>
+                        <td>@employee.PayrollNumber</td>
+                        <td>
+                           @Html.ActionLink("Edit","Edit","Employee", new {id=employee.Id})
+                        </td>
+                        <td>
+                            <button data-employee-id="@employee.Id" class="btn-link js-delete">Delete</button>
+                        </td>
+                    </tr>
+                }
+        </tbody>
+    </table>
+}
+
+@section scripts
+{
+<script>
+    $(document).ready(function () {
+        $("#employees .js-delete").on("click", function () {
+            var button = $(this);
+            if (confirm("Are you sure to delete!")) {
+                $.ajax({
+                    url: "/api/employee/" + $(this).attr("data-employee-id"),
+                    method: "DELETE",
+                    success: function () {
+                        button.parents("tr").remove();
+                    }
+                });
+            }
+        });
+    });
+</script>
+}
